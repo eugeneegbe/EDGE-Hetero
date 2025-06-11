@@ -305,6 +305,7 @@ class RDFGraphDataset(DGLBuiltinDataset):
         if self.verbose:
             print("Total #nodes:", g.number_of_nodes())
             print("Total #edges:", g.number_of_edges())
+            print("Average Node degree:", g.number_of_edges() / g.number_of_nodes())
 
         # rename names such as 'type' so that they an be used as keys
         # to nn.ModuleDict

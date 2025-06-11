@@ -4,29 +4,5 @@
       "best_concept": "OWLObjectAllValuesFrom(property=OWLObjectInverseOf(OWLObjectProperty(IRI('http://swrc.ontoware.org/ontology#','member'))),filler=OWLClass(IRI('http://swrc.ontoware.org/ontology#','ResearchGroup')))",
       "concept_length": 4
     }
-  },
-  "Run_2": {
-    "id1instance": {
-      "best_concept": "OWLObjectAllValuesFrom(property=OWLObjectInverseOf(OWLObjectProperty(IRI('http://swrc.ontoware.org/ontology#','member'))),filler=OWLClass(IRI('http://swrc.ontoware.org/ontology#','ResearchGroup')))",
-      "concept_length": 4
-    }
-  },
-  "Run_3": {
-    "id1instance": {
-      "best_concept": "OWLObjectAllValuesFrom(property=OWLObjectInverseOf(OWLObjectProperty(IRI('http://swrc.ontoware.org/ontology#','member'))),filler=OWLClass(IRI('http://swrc.ontoware.org/ontology#','ResearchGroup')))",
-      "concept_length": 4
-    }
-  },
-  "Run_4": {
-    "id1instance": {
-      "best_concept": "OWLObjectAllValuesFrom(property=OWLObjectInverseOf(OWLObjectProperty(IRI('http://swrc.ontoware.org/ontology#','member'))),filler=OWLClass(IRI('http://swrc.ontoware.org/ontology#','ResearchGroup')))",
-      "concept_length": 4
-    }
-  },
-  "Run_5": {
-    "id1instance": {
-      "best_concept": "OWLObjectAllValuesFrom(property=OWLObjectInverseOf(OWLObjectProperty(IRI('http://swrc.ontoware.org/ontology#','member'))),filler=OWLClass(IRI('http://swrc.ontoware.org/ontology#','ResearchGroup')))",
-      "concept_length": 4
-    }
   }
 }

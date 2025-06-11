@@ -76,8 +76,11 @@ class HeteroFeature(nn.Module):
             if h is None:
                 if all_feats:
                     embed_dict[ntype] = n_nodes
+            elif len(h.shape) == 1:
+                linear_dict[ntype] = 1
             else:
                 linear_dict[ntype] = h.shape[1]
+    
         self.embes = HeteroEmbedding(embed_dict, embed_size)
         if need_trans:
             self.linear = HeteroLinear(linear_dict, embed_size)
@@ -86,7 +89,16 @@ class HeteroFeature(nn.Module):
     def forward(self):
         out_dict = nn.ParameterDict()
         out_dict.update(self.embes.weight)
-        tmp = self.linear(self.h_dict)
+
+         # Prepare input for the linear layer
+        h_dict = {}
+        for ntype, h in self.h_dict.items():
+            if ntype in self.linear.linears:  # Ensure the node type has a corresponding linear layer
+                if len(h.shape) == 1:  # If the feature is a scalar (e.g., node degree)
+                    h = h.unsqueeze(1)  # Add a dimension to make it (batch_size, 1)
+                h_dict[ntype] = h
+
+        tmp = self.linear(h_dict)
         if self.act:  # activate
             for x, y in tmp.items():
                 tmp.update({x: self.act(y)})

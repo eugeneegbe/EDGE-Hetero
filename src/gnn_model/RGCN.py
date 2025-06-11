@@ -48,7 +48,7 @@ class RGCN(nn.Module):
         use_self_loop=False,
     ):
         super(RGCN, self).__init__()
-        self.in_dim = in_dim
+        self.in_dim = in_dim + 1
         self.h_dim = hidden_dim
         self.out_dim = out_dim
         self.category = category
@@ -116,6 +116,11 @@ class RGCN(nn.Module):
         h: dict[str, th.Tensor]
             output feature
         """
+
+        for ntype in feat:
+            degree_feat = graph.ndata['degree'][ntype].unsqueeze(1)
+            feat[ntype] = th.cat([feat[ntype], degree_feat], dim=1)
+
         if embed:
             feat = self.layers[0](graph, feat)
             return feat

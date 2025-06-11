@@ -112,8 +112,22 @@ class Explainer:
         self.explanations = {}
         self.evaluations = {}
 
+        # Node degree as sum of incoming edges for each node type
+        node_degrees = {
+            ntype: sum(
+                self.g.in_degrees(etype=canonical_etype).float()
+                for canonical_etype in self.g.canonical_etypes
+                if canonical_etype[2] == ntype  # Match destination node type
+            )
+            for ntype in self.g.ntypes
+        }
+
+        # Normalize node degrees
+        for ntype in node_degrees:
+            node_degrees[ntype] = node_degrees[ntype] / node_degrees[ntype].max()
+
         self.input_feature = HeteroFeature(
-            {}, get_nodes_dict(self.g), self.hidden_dim, act=self.act
+            node_degrees, get_nodes_dict(self.g), self.hidden_dim, act=self.act
         ).to(self.device)
 
         if self.model_name == "RGCN":

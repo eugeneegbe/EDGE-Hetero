@@ -56,7 +56,12 @@ class RGAT(nn.Module):
         )
         return
 
-    def forward(self, hg, h_dict=None, embed=False, eweight=None, **kwargs):
+    def forward(self, hg, h_dict=None, degree_dict=None, embed=False, eweight=None, **kwargs):
+        if degree_dict is not None:
+            for ntype in h_dict:
+                degree = degree_dict[ntype].unsqueeze(1)  # Add a dimension for concatenation
+                h_dict[ntype] = th.cat([h_dict[ntype], degree], dim=1)
+
         if embed:
             h_dict = self.layers[0](hg, h_dict, embed=True)
             return h_dict
