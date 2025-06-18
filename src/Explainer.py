@@ -3,6 +3,7 @@ import os
 import time
 
 # import matplotlib.pyplot as plt
+import dgl
 import numpy as np
 import pandas as pd
 import torch
@@ -80,6 +81,16 @@ class Explainer:
         )
 
         self.g = self.my_dataset.g.to(self.device)
+
+        # Compute and add 'degree' feature for all node types
+        for ntype in self.g.ntypes:
+            degree_feat = sum(
+                self.g.in_degrees(etype=canonical_etype).float()
+                for canonical_etype in self.g.canonical_etypes
+                if canonical_etype[2] == ntype  # Match destination node type
+            )
+            self.g.nodes[ntype].data['degree'] = degree_feat
+
         self.out_dim = self.my_dataset.num_classes
         self.e_types = self.g.etypes
         self.category = self.my_dataset.category
@@ -115,9 +126,9 @@ class Explainer:
         # Node degree as sum of incoming edges for each node type
         node_degrees = {
             ntype: sum(
-                self.g.in_degrees(etype=canonical_etype).float()
-                for canonical_etype in self.g.canonical_etypes
-                if canonical_etype[2] == ntype  # Match destination node type
+            self.g.in_degrees(etype=canonical_etype).float()
+            for canonical_etype in self.g.canonical_etypes
+            if canonical_etype[2] == ntype  # Match destination node type
             )
             for ntype in self.g.ntypes
         }
@@ -125,6 +136,89 @@ class Explainer:
         # Normalize node degrees
         for ntype in node_degrees:
             node_degrees[ntype] = node_degrees[ntype] / node_degrees[ntype].max()
+
+        # ========= ONE-HOT encoding ===========
+        node_type_one_hot = {
+            ntype: torch.eye(len(self.g.nodes(ntype)), device=self.device)
+            for ntype in self.g.ntypes
+        }
+
+        # ========= In degree ===========
+        node_in_degree = {
+            ntype: self.g.in_degrees(etype=canonical_etype).float()
+            for ntype in self.g.ntypes
+            for canonical_etype in self.g.canonical_etypes
+            if canonical_etype[2] == ntype  # Match destination node type
+        }
+        # Normalize in degrees
+        for ntype in node_in_degree:
+            node_in_degree[ntype] = node_in_degree[ntype] / node_in_degree[ntype].max()
+
+        # ========= Out degree ===========
+        # compute node out degree
+        node_out_degree = {
+            ntype: sum(
+            self.g.out_degrees(etype=canonical_etype).float()
+            for canonical_etype in self.g.canonical_etypes
+            if canonical_etype[0] == ntype  # Match source node type
+            )
+            for ntype in self.g.ntypes
+        }
+
+        # Normalize out degrees
+        for ntype in node_out_degree:
+            node_out_degree[ntype] = node_out_degree[ntype] / node_out_degree[ntype].max()
+
+
+        # ========= CLUSTERING COEFFICIENT ===========
+        # Convert to homogeneous grpah to ignore edge types
+        import networkx as nx
+        from dgl import to_homogeneous
+        homogeneous_graph = to_homogeneous(self.g)
+
+        # Convert to NetworkX graph for triangle counting
+        nx_graph = homogeneous_graph.to_networkx()
+
+        # remove edge multiplicities
+        nx_simple_g = nx.Graph(nx_graph)
+        
+        trianggle_dict = nx.triangles(nx_simple_g)
+
+        degrees = dict(nx_graph.degree())
+        # Calculate local clustering coefficient for each node
+
+        clustering_coef = {ntype: {} for ntype in self.g.ntypes}
+        for node in nx_graph.nodes():
+            k = degrees[node]
+            t = trianggle_dict[node]
+            if k > 2:
+                coef = (2 * t) / (k * (k - 1))
+            else:
+                coef = 0.0
+
+            # Map the node back to its original type and ID
+            original_ntype, original_id = homogeneous_graph.ndata[dgl.NTYPE][node].item(), homogeneous_graph.ndata[dgl.NID][node].item()
+            ntype = self.g.ntypes[original_ntype]
+            clustering_coef[ntype][original_id] = coef
+
+        # Combine node degrees and one-hot encoding
+        for ntype in node_degrees:
+            # Combine node degrees, in-degree, out-degree, one-hot encoding, and clustering coefficient
+            combined_features = [
+                node_degrees[ntype].unsqueeze(1),
+                node_type_one_hot[ntype],
+            ]
+
+            # Add clustering coefficient if available for the node type
+            # clustering_tensor = torch.zeros(len(self.g.nodes(ntype)), device=self.device)
+            # for node_id, coef in clustering_coef[ntype].items():
+            #     clustering_tensor[node_id] = coef
+            # combined_features.append(clustering_tensor.unsqueeze(1))
+
+            # Concatenate all features
+            node_degrees[ntype] = torch.cat(combined_features, dim=1)
+
+        print('node_degrees', node_degrees)
 
         self.input_feature = HeteroFeature(
             node_degrees, get_nodes_dict(self.g), self.hidden_dim, act=self.act
@@ -175,6 +269,9 @@ class Explainer:
         self.model.train()
         for epoch in range(self.epochs):
             t0 = time.time()
+
+            # Ensure feature dimensions match the weight matrix
+            self.feat = {k: v if v.size(1) == self.hidden_dim else v[:, :self.hidden_dim] for k, v in self.feat.items()}
             logits = self.model(self.g, self.feat)[self.category]
             loss = self.loss_fn(logits[self.train_idx], self.labels[self.train_idx])
             self.optimizer.zero_grad()
@@ -212,6 +309,9 @@ class Explainer:
                 break
         print("End Training")
         self.model = self.early_stopping.best_model
+
+        # Ensure feature dimensions match the model's expected input
+        self.feat = {k: v if v.size(1) == self.hidden_dim else v[:, :self.hidden_dim] for k, v in self.feat.items()}
         pred_logit = self.model(self.g, self.feat)[self.category]
 
         val_acc_final = th.sum(
