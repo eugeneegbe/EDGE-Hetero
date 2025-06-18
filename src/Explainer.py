@@ -135,13 +135,15 @@ class Explainer:
 
         # Normalize node degrees
         for ntype in node_degrees:
-            node_degrees[ntype] = node_degrees[ntype] / node_degrees[ntype].max()
+            node_degrees[ntype] = (node_degrees[ntype] - node_degrees[ntype].min()) / (node_degrees[ntype].max() - node_degrees[ntype].min() + 1e-8)
 
         # ========= ONE-HOT encoding ===========
         node_type_one_hot = {
             ntype: torch.eye(len(self.g.nodes(ntype)), device=self.device)
             for ntype in self.g.ntypes
         }
+        for ntype in node_type_one_hot:
+            node_type_one_hot[ntype] = (node_type_one_hot[ntype] - node_type_one_hot[ntype].min()) / (node_type_one_hot[ntype].max() - node_type_one_hot[ntype].min() + 1e-8)
 
         # ========= In degree ===========
         node_in_degree = {
@@ -201,6 +203,7 @@ class Explainer:
             ntype = self.g.ntypes[original_ntype]
             clustering_coef[ntype][original_id] = coef
 
+
         # Combine node degrees and one-hot encoding
         for ntype in node_degrees:
             # Combine node degrees, in-degree, out-degree, one-hot encoding, and clustering coefficient
@@ -210,15 +213,15 @@ class Explainer:
             ]
 
             # Add clustering coefficient if available for the node type
-            # clustering_tensor = torch.zeros(len(self.g.nodes(ntype)), device=self.device)
-            # for node_id, coef in clustering_coef[ntype].items():
-            #     clustering_tensor[node_id] = coef
-            # combined_features.append(clustering_tensor.unsqueeze(1))
+            clustering_tensor = torch.zeros(len(self.g.nodes(ntype)), device=self.device)
+            for node_id, coef in clustering_coef[ntype].items():
+                clustering_tensor[node_id] = coef
+            combined_features.append(clustering_tensor.unsqueeze(1))
 
+            normalized_clustering_tensor = (clustering_tensor - clustering_tensor.min()) / (clustering_tensor.max() - clustering_tensor.min() + 1e-8)
+            combined_features.append(normalized_clustering_tensor.unsqueeze(1))
             # Concatenate all features
             node_degrees[ntype] = torch.cat(combined_features, dim=1)
-
-        print('node_degrees', node_degrees)
 
         self.input_feature = HeteroFeature(
             node_degrees, get_nodes_dict(self.g), self.hidden_dim, act=self.act
