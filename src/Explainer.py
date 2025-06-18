@@ -126,7 +126,8 @@ class Explainer:
         self.hetero_features = self.compute_hetero_features(self.g)
 
         self.input_feature = HeteroFeature(
-            self.hetero_features, get_nodes_dict(self.g), self.hidden_dim, act=self.act
+            {} if self.hetero_features is None else self.hetero_features,
+            get_nodes_dict(self.g), self.hidden_dim, act=self.act
         ).to(self.device)
 
         if self.model_name == "RGCN":
@@ -166,6 +167,11 @@ class Explainer:
         self.run_explainers()
 
     def compute_hetero_features(self, g):
+        # check if the graph has features if not return None
+        if not any(g.nodes[ntype].data for ntype in g.ntypes):
+            print("Graph has no features. Returning None.")
+            return None
+
         # Node degree as sum of incoming edges for each node type
         hetero_feature_base = {
             ntype: sum(
