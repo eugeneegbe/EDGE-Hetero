@@ -111,21 +111,10 @@ The RGCN results can be printed on the terminal using:
 ```shell
 python main.py --print_results --model RGCN
 ```
-If you just want to observe the results, <details><summary> Click me! </summary>
+If you just want to observe the results we had, <details><summary> Click me! </summary>
 
-| Model | Dataset | Pred Accuracy | Pred Precision | Pred Recall | Pred F1 Score | Exp Accuracy | Exp Precision | Exp Recall | Exp F1 Score |
-|---|---|---|---|---|---|---|---|---|---|
-| CELOE | aifb | 0.722 | 0.647 | 0.733 | 0.688 | 0.744 | 0.694 | 0.745 | 0.718 |
-| EvoLearner | aifb | 0.65 | 0.545 | 0.987 | 0.702 | 0.672 | 0.574 | 0.986 | 0.724 |
-| PGExplainer | aifb | 0.667 | 0.605 | 0.68 | 0.634 | 0.689 | 0.647 | 0.696 | 0.666 |
-| SubGraphX | aifb | 0.656 | 0.595 | 0.68 | 0.628 | 0.667 | 0.624 | 0.683 | 0.647 |
-| CELOE | bgs | 0.517 | 0.409 | 0.9 | 0.563 | 0.531 | 0.436 | 0.889 | 0.583 |
-| EvoLearner | bgs | 0.531 | 0.418 | 0.92 | 0.575 | 0.559 | 0.454 | 0.931 | 0.609 |
-| PGExplainer | bgs | 0.538 | 0.38 | 0.54 | 0.441 | 0.566 | 0.442 | 0.592 | 0.497 |
-| SubGraphX | bgs | 0.524 | 0.381 | 0.6 | 0.465 | 0.566 | 0.445 | 0.662 | 0.529 |
-| CELOE | mutag | 0.703 | 0.718 | 0.92 | 0.804 | 0.632 | 0.617 | 0.897 | 0.726 |
-| EvoLearner | mutag | 0.685 | 0.707 | 0.92 | 0.795 | 0.632 | 0.612 | 0.904 | 0.725 |
-| PGExplainer | mutag | 0.456 | 0.663 | 0.373 | 0.475 | 0.691 | 0.889 | 0.587 | 0.681 |
-| SubGraphX | mutag | 0.432 | 0.635 | 0.347 | 0.445 | 0.674 | 0.88 | 0.565 | 0.66 |
-
+|    Model    | Dataset | Pred Accuracy | Pred Precision | Pred Recall | Pred F1 Score | Exp Accuracy | Exp Precision | Exp Recall | Exp F1 Score |
+|-------------|---------|---------------|----------------|-------------|---------------|--------------|---------------|------------|--------------|
+|    CELOE    |   aifb  |     0.722     |     0.647      |    0.733    |     0.688     |    0.756     |     0.718     |   0.751    |    0.733     |
+|  EvoLearner |   aifb  |     0.672     |     0.567      |    0.947    |     0.707     |    0.706     |     0.614     |    0.950   |    0.743     |
 </details>
