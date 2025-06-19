@@ -19,7 +19,7 @@ default_datasets = ["mutag", "aifb", "bgs"]
 default_explainers = ["EvoLearner", "SubGraphX", "PGExplainer", "CELOE"]
 
 # Default value for the model argument
-default_model = "RGCN"
+default_model = "RGAT"
 
 
 def validate_model(value):
