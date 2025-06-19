@@ -23,7 +23,7 @@ def render_owl_expression(expression):
     for key, value in replacements.items():
         expression = expression.replace(key, value)
     # Remove the prefix
-    expression = expression.replace(prefix, "")
+    expression = expression.replace(prefix, "").replace("=", " ")
     # Remove unwanted characters
     return expression.translate(str.maketrans("", "", "()',"))
 
