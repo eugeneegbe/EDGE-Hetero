@@ -4,7 +4,7 @@ import time
 from ontolearn.concept_learner import EvoLearner
 from ontolearn.knowledge_base import KnowledgeBase
 from ontolearn.learning_problem import PosNegLPStandard
-from ontolearn.metrics import F1, 
+from ontolearn.metrics import F1
 from owlapy.model import IRI, OWLNamedIndividual
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 
