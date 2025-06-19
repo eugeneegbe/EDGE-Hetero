@@ -1,7 +1,8 @@
-# EDGE-Hetero: Evaluation of Diverse Knowledge Graph Explanations With Heterogeneous Features
+# EDGE-Hetero: EDGE framework with Heterogeneous features
 
-The **EDGE** framework represents a novel approach in evaluating explanations produced by various node classifiers on knowledge graphs. Standing for "Evaluation of Diverse Knowledge Graph Explanations," EDGE integrates an array of advanced Graph Neural Networks (GNNs), sub-graph-based GNN explainers, logical explainers, and a comprehensive set of evaluation metrics. This framework is designed to automate the evaluation process, efficiently handling methods within its scope and delivering results in a clear, structured manner. The primary goals of EDGE are to incorporate cutting-edge node classifiers from existing literature, to provide a quantitative assessment of different explainers using multiple metrics, to streamline the evaluation process, and to conduct evaluations using real-world datasets.
+The **[EDGE](https://github.com/ds-jrg/EDGE)** framework is a novel framework for evaluating explanations from various node classifiers on knowledge graphs, utilizing advanced Graph Neural Networks and a range of evaluation metrics. It automates the evaluation process, aiming to quantitatively assess explainers and streamline evaluations with real-world datasets. This however does not cover heterogenous features of the graphs which are provided as input to these classifiers.
 
+**EDGE-Hetero** justs simply seeks to add more flavor to the features used by the EDGE and report the findings of the behavior of the models and explainers with the added features.
 
 ## Logical Approaches
 1. **EvoLearner:** [EvoLearner: Learning Description Logics with Evolutionary Algorithms](https://arxiv.org/abs/2111.04879)
@@ -11,31 +12,27 @@ The logical approaches in the EDGE framework, including EvoLearner and CELOE, we
 
 
 ## Sub-graph-based Approaches
-1. **PGExplainer:**  [Parameterized Explainer for Graph Neural Network](https://arxiv.org/abs/2011.04573)
-2. **SubgraphX:**  [On Explainability of Graph Neural Networks via Subgraph Explorations](https://arxiv.org/abs/2102.05152)
-
-The sub-graph-based approaches in the EDGE framework, including PGExplainer and SubgraphX, were adapted from the [DGL (Deep Graph Library)](https://docs.dgl.ai/en/1.1.x/api/python/nn-pytorch.html).
-
-These explainers collectively enhance the capability of the EDGE framework to provide comprehensive and insightful evaluations.
+For the subgraph approaches please refer to the [EDGE framework](https://github.com/ds-jrg/EDGE?tab=readme-ov-file#sub-graph-based-approaches)
 
 
 ## Datasets
+The collection of benchmark datasets used on the EDGE framework are also supported
+
 [A Collection of Benchmark Datasets for Systematic Evaluations of Machine Learning on the Semantic Web](https://link.springer.com/chapter/10.1007/978-3-319-46547-0_20)
-1. **Mutag** [Structure-activity relationship of mutagenic aromatic and heteroaromatic nitro compounds](https://pubmed.ncbi.nlm.nih.gov/1995902/)
-2. **AIFB** [Kernel Methods for Mining Instance Data in Ontologies](https://link.springer.com/chapter/10.1007/978-3-540-76298-0_5)
-3. **BGS** [British Geological Survey](https://www.bgs.ac.uk/datasets/bgs-geology-625k-digmapgb/)
+1. [Mutag](https://pubmed.ncbi.nlm.nih.gov/1995902/)
+2. [AIFB](https://link.springer.com/chapter/10.1007/978-3-540-76298-0_5)
+3. [BGS](https://www.bgs.ac.uk/datasets/bgs-geology-625k-digmapgb/)
 
 
-## Installation Guide for the EDGE Framework
-
-Follow these steps to set up the EDGE environment on your system:
+## Installation Guide for EDGE-Hetero
+This install is pretty similar to setting up the EDGE framework 
 
 ### Step 1: Clone the EDGE Repository
 
 First, clone the EDGE repository from GitHub using the following command:
 
-```shell
-git clone https://github.com/ds-jrg/EDGE.git
+```bash
+git clone https://github.com/eugeneegbe/EDGE-Hetero.git
 ```
 
 ### Step 2: Install Conda
@@ -46,9 +43,8 @@ If you don't have Conda installed, download and install it from [Anaconda's offi
 ### Step 3: Create the Conda Environment
 
 ```shell
-conda create --name edge python=3.10 && conda activate edge
+conda create --name edge-hetero python=3.10 && conda activate edge-hetero
 ```
-
 
 ### Step 5: Install Dependencies
 
@@ -62,44 +58,20 @@ This command will automatically install all the libraries and packages listed in
 ```shell
 conda install -c dglteam/label/th23_cu121 dgl
 ```
-After completing these steps, your EDGE environment should be set up with all the necessary dependencies, except for DGL library.
+At this level, edge-hetero is good to experiment with
 
 ## Dataset Preprocessing
-The datasets for the sub-graph explainers are automatically downloaded and processed by the DGL library. However, the Knowledge Graphs for the logical explainers need to be created manually. For convenience, we provide pre-processed Knowledge Graphs that were generated using the same data sources, specifically the files from the DGL distribution. These pre-processed Knowledge Graphs can be used directly to start and run the explainers. They are available in the [KGs.zip](KGs.zip). file. To unzip and place them in the `data/KGs` folder, use the following command:
-```shell
-mkdir -p data/KGs && unzip KGs.zip -d data/KGs/ 
-```
-If you wish to re-create the Knowledge Graphs, feel free to follow the steps below:
-<details><summary> Click me! </summary>
-### Installing the ROBOT Tool
-
-For converting N3/NT files to the OWL file format within the EDGE framework, the ROBOT (RObotic Batch Ontology) tool is required. However, if you want to use the Knowledge Graph data that are readily avilable, you can skip the installation of ROBOT library and also the preprocessing steps.
-
-Download the ROBOT tool from its official website for the latest release and installation instructions:
-
-[ROBOT Official Website](http://robot.obolibrary.org/)
-
-Follow the instructions on the website to download and install ROBOT. Ensure it's properly installed and configured on your system for use with the EDGE framework.
+For custom data preprocessing, please refer to the [EDGE framework](https://github.com/ds-jrg/EDGE?tab=readme-ov-file#dataset-preprocessing)
 
 
-If you have a linux based system, you can also easily execute all the preprocessing steps using a single script. First, provide the required permissions to the preprocessing script. Then execute the script.
-```shell
-chmod +x preprocess.sh
-```
+## Using and extending EDGE-Hetero
 
-```shell
-./preprocess.sh
-```
-</details>
+Same as the EDGE framework, to train models with specific models and/or datasets, use the `--train` flag along with `--model`, `--explainers`, `--datasets` and **`--describe`** flags as needed. See the examples below.
 
-## Example Commands for Using the EDGE Framework
+**Note:** As opposed to EDGE, Hetero uses RGAT as default model.
 
-Below are some example commands to illustrate how to use the EDGE framework. These examples assume you have already set up the environment per the installation guide.
-
-
-To train models with specific models and/or datasets, use the `--train` flag along with `--model`, `--explainers`  and `--datasets` flags as needed. See the examples below.
-
-- Training all combination of explainers and datasets for 5 Runs with default RGCN model, use the command:
+- Training all combination of explainers and datasets for 5 Runs with default RGAT
+model, use the command:
   ```shell
   python main.py --train 
   ```
@@ -114,52 +86,30 @@ To train models with specific models and/or datasets, use the `--train` flag alo
   python main.py --train --datasets mutag bgs
   ```
 
+- Training models on specific datasets and describe the dataset:
+  ```shell
+  python main.py --train --datasets mutag bgs --describe True
+  ```
+
 - Combining specific explainers and datasets:
   ```shell
   python main.py --train --explainers SubGraphX CELOE --datasets aifb
   ```
-- Training specific GNN Model(The RGCN model is used by default and does not need to be explicitly mentioned.):
+
+- Train the RGCN model specifically:
   ```shell
-  python main.py --train  --model RGAT 
-  ```
-
-
-If you wisth to train for all the explainers and datasets, you can simply omit the tags from the arguments. The default number of runs is 5 and the default GNN Model is RGCN.
-
-- Training for certains number of runs for all explainers-dataset combo:
-  ```shell
-  python main.py --train  --num_runs 3 
-  ```
-There is also support for prining results, in which you can specify the model you want to print results for, defaults to "RGCN"
-
-- Print Results
-  ```shell
-  python main.py --print_results
+  python main.py --train  --model RGCN 
   ```
 
 - Print Results for specific using the model 
   ```shell
-  python main.py --print_results --model RGAT
+  python main.py --print_results --model RGCN
   ```
 
-## Example Explanations
-Here are some example explanations from the different explaniers.
-
-- Sub-graph explanation of a node of Mutag Dataset
-![Mutag](results/exp_visualizations/exp_pg_9193.png) 
-
-- Logical explanation as OWL Class Expression
-![CE](results/exp_visualizations/CE.png)
-
-- Logical Explanation in DL Syntax
-```
-(∃ hasAtom.Carbon-10) ⊓ (≥ 10 hasStructure.(¬Non_ar_6c_ring))
-```
-
-## RGAT Results
-The RGAT results can be printed on the terminal using:
+## RGCN Results
+The RGCN results can be printed on the terminal using:
 ```shell
-python main.py --print_results --model RGAT
+python main.py --print_results --model RGCN
 ```
 If you just want to observe the results, <details><summary> Click me! </summary>
 
@@ -179,23 +129,3 @@ If you just want to observe the results, <details><summary> Click me! </summary>
 | SubGraphX | mutag | 0.432 | 0.635 | 0.347 | 0.445 | 0.674 | 0.88 | 0.565 | 0.66 |
 
 </details>
-
-## Cite Us !!
-
-If you have referred to our work or found it helpful, please consider citing it using the following entry:
-
-```
-@inproceedings{Sapkota2024EDGE,
-  author       = {Rupesh Sapkota and
-                  Dominik Köhler and
-                  Stefan Heindorf},
-  title        = {EDGE: Evaluation Framework for Logical vs. Subgraph
-Explanations for Node Classifiers on Knowledge Graphs},
-  booktitle    = {{CIKM}},
-  publisher    = {{ACM}},
-  year         = {2024}
-}
-```
-
-## Contact Us
-For any queries or collaborations, please contact ```rupezzz@mail.uni-paderborn.de``` or ```heindorf@upb.de``` . If you have found any bugs raise an Issue or  if want to contribute, open a new feature branch and create a Pull Request.
