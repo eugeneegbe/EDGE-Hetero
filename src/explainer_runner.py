@@ -7,7 +7,8 @@ from src.Explainer import Explainer
 
 
 def run_explainers(
-    dataset, explainers, print_explainer_loss=True, no_of_runs=5, model="RGCN"
+    dataset, explainers, print_explainer_loss=True, no_of_runs=5, model="RGCN",
+    describe=False
 ):
     print(f"Running explainers for {no_of_runs} runs for dataset {dataset}")
     performances = {}
@@ -19,7 +20,8 @@ def run_explainers(
         performances[i] = {}
         preds[i] = {}
         my_explainer = Explainer(
-            explainers=explainers, dataset=dataset, model_name=model
+            explainers=explainers, dataset=dataset, model_name=model,
+            describe=describe
         )
         for explainer in explainers:
             if explainer == "PGExplainer":

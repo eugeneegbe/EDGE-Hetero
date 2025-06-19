@@ -16,7 +16,7 @@ torch.cuda.empty_cache()
 
 import networkx as nx
 from dgl.nn.pytorch.explain import HeteroPGExplainer
-
+from src.dglnn_local.RDFDataset import RENAME_DICT
 from src.dglnn_local.subgraphx import NodeSubgraphX
 from src.gnn_model.configs import get_configs
 from src.gnn_model.dataset import RDFDatasets
@@ -60,11 +60,13 @@ class Explainer:
         explainers: list,
         dataset: str,
         model_name: str = "RGCN",
+        describe: bool = False
     ):
         self.explainers = explainers
         self.dataset = dataset
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model_name = model_name
+        self.describe = describe
 
         self.configs = get_configs(self.dataset, model=self.model_name)
         self.hidden_dim = self.configs["hidden_dim"]
@@ -76,13 +78,16 @@ class Explainer:
         self.hidden_layers = self.configs["num_layers"] - 1
         self.act = None
         self.patience = self.configs["patience"]
-
         self.my_dataset = RDFDatasets(
             self.dataset, root="data/", validation=self.validation
         )
 
         self.g = self.my_dataset.g.to(self.device)
 
+        # Desribe graph if requested by user
+        if self.describe:
+            self.describe_dataset(self.g)
+        
         # Compute and add 'degree' feature for all node types
         for ntype in self.g.ntypes:
             degree_feat = sum(
@@ -242,6 +247,55 @@ class Explainer:
             hetero_feature_base[ntype] = torch.cat(combined_features, dim=1)
 
         return hetero_feature_base
+
+
+    def describe_dataset(self, g):
+        etypes = self.g.etypes
+        etypes = [RENAME_DICT.get(ty, ty) for ty in etypes]
+        print('===== Node Statistics ======')
+        print("Node types:", set(g.ntypes))
+        print("#Node types:", len(g.ntypes))
+        for ntype in g.ntypes:
+            print(f"#Count for node type [{ntype}]:", g.num_nodes(ntype))
+        
+        print("List of node features:")
+        for ntype in g.ntypes:
+            i = 0
+            if len(g.nodes[ntype].data) > 0:
+                print(f"\tNode type [{ntype}] has features: {list(g.nodes[ntype].data.keys())}")
+            else:
+                print(f"\tNode type [{ntype}] has no features.")
+
+        print('\n===== Edge Statistics ======')
+        print("#Canonical edge types:", len(g.etypes))
+        print("#Unique edge type names:", len(set(g.etypes)))
+        edge_counts = {
+            canonical_etype: g.num_edges(canonical_etype)
+            for canonical_etype in g.canonical_etypes
+        }
+        top_edge_types = sorted(edge_counts.items(), key=lambda x: x[1], reverse=True)[:3]
+        print("Top 3 most used edge types:")
+        for canonical_etype, count in top_edge_types:
+            print(f"Edge type [{canonical_etype}]: {count} edges")
+
+        print('===== Labels ======')
+        for i, label in enumerate(etypes):
+            print(f"\tClass {i}: {label}")
+            if i == 5:
+                break
+
+        label_counts = pd.Series(etypes).value_counts()
+        top_three_labels = label_counts.head(3)
+        print("Top 3 most frequent labels:")
+        for label, count in top_three_labels.items():
+            print(f"Label [{label}]: {count} occurrences")
+
+        print('\n===== Graph Density ======')
+        # How connected or loose our graph is: strong/weak
+        num_nodes = g.number_of_nodes()
+        num_edges = g.number_of_edges()
+        density = 2 * num_edges / (num_nodes * (num_nodes - 1))
+        print(f"Graph density: {density}")
 
 
     def train(self):

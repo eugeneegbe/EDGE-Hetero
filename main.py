@@ -91,10 +91,19 @@ if __name__ == "__main__":
         help="Specify to print results",
     )
 
+    parser.add_argument(
+        "--describe",
+        type=bool,
+        default=False, # use true to describe dataset
+        help="Describe dataset",
+    )
+
     args = parser.parse_args()
     print("Datasets:", args.datasets)
     print("Explainers", args.explainers)
     print("Model name:", args.model)
+    print("Describe:", args.describe)
+
     if args.train:
         from src.explainer_runner import run_explainers
 
@@ -104,6 +113,7 @@ if __name__ == "__main__":
                 dataset=dataset,
                 no_of_runs=args.num_runs,
                 model=args.model,
+                describe=args.describe
             )
 
     if args.print_results:
