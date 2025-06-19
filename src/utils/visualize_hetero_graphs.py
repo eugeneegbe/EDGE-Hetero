@@ -3,13 +3,10 @@ import colorsys
 import logging
 import math
 import os
-import re
 
 import dgl
-import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import networkx as nx
-import torch
 from matplotlib.patches import Patch
 
 logging.basicConfig(level=logging.INFO)

@@ -1,8 +1,5 @@
 """ Code Adapted from https://github.com/BUPT-GAMMA/OpenHGNN"""
 
-import dgl
-import dgl.function as fn
-import numpy as np
 import torch as th
 
 from src.dglnn_local.RDFDataset import (AIFBDataset, AMDataset, BGSDataset,

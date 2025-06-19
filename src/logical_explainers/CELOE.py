@@ -1,4 +1,3 @@
-import json
 import os
 import time
 
@@ -6,7 +5,7 @@ from ontolearn.concept_learner import CELOE
 from ontolearn.heuristics import CELOEHeuristic
 from ontolearn.knowledge_base import KnowledgeBase
 from ontolearn.learning_problem import PosNegLPStandard
-from ontolearn.metrics import F1, Accuracy
+from ontolearn.metrics import F1
 from ontolearn.refinement_operators import ModifiedCELOERefinement
 from owlapy.model import IRI, OWLNamedIndividual
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support

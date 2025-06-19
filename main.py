@@ -3,7 +3,7 @@ import argparse
 
 # Custom validation function for datasets argument
 def validate_datasets(value):
-    valid_datasets = ["mutag", "aifb", "bgs"]  # Add more valid datasets as needed
+    valid_datasets = ["mutag", "aifb", "bgs"] # Add more valid datasets as needed
     datasets = value.split()
     for dataset in datasets:
         if dataset not in valid_datasets:

@@ -1,4 +1,4 @@
-""" This example script demonstrates how to visualize the explanations produced by SubGraphX.
+""" This example script demonstrates how to visualize the explanations made by SubGraphX.
  Similar methods can be used to implement visualization for other GNN explainers.
  The dataset and model used can be varied."""
 

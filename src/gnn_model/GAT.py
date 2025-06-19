@@ -1,8 +1,6 @@
-import dgl
 import dgl.nn as dglnn
 import torch as th
 import torch.nn as nn
-import torch.nn.functional as F
 
 
 class RGAT(nn.Module):

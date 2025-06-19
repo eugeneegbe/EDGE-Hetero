@@ -1,5 +1,4 @@
 import os
-from urllib.parse import quote, urlparse
 
 import rdflib as rdf
 from rdflib import XSD, Graph, Literal
@@ -33,8 +32,8 @@ def load_dataset(root="data/"):
 
 def pre_process_mutag():
     """
-    Processes the MUTAG dataset by filtering out certain predicates and blank nodes,
-    and serializes the processed graph into a new file.
+    Processes the MUTAG dataset by filtering out certain predicates 
+    and blank nodes, and serializes the processed graph into a new file.
 
     The function reads the raw MUTAG dataset, filters out triples where the predicate
     is 'isMutagenic' and either the subject or object is a blank node. It also converts

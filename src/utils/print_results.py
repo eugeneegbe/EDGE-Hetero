@@ -1,5 +1,4 @@
 import json
-import os
 from statistics import mean
 
 from prettytable import PrettyTable
