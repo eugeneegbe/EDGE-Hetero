@@ -1,4 +1,4 @@
-# EDGE-Hetero: EDGE framework with Heterogeneous features
+# EDGE-Hetero: EDGE framework with Heterogeneous Node Features
 
 The **[EDGE](https://github.com/ds-jrg/EDGE)** framework is a novel framework for evaluating explanations from various node classifiers on knowledge graphs, utilizing advanced Graph Neural Networks and a range of evaluation metrics. It automates the evaluation process, aiming to quantitatively assess explainers and streamline evaluations with real-world datasets. This however does not cover heterogenous features of the graphs which are provided as input to these classifiers.
 
