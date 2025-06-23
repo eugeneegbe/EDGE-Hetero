@@ -8,10 +8,8 @@ import torch
 import torch as th
 import torch.nn.functional as F
 import yaml
-
-torch.cuda.empty_cache()
-
 import networkx as nx
+
 from dgl.nn.pytorch.explain import HeteroPGExplainer
 from src.dglnn_local.RDFDataset import RENAME_DICT
 from src.dglnn_local.subgraphx import NodeSubgraphX
@@ -25,6 +23,8 @@ from src.gnn_model.utils import (calculate_metrics, gen_evaluations,
                                  get_lp_mutag_fid, get_nodes_dict)
 from src.logical_explainers.CELOE import train_celoe
 from src.logical_explainers.EvoLearner import train_evo
+
+torch.cuda.empty_cache()
 
 
 class EarlyStopping:
@@ -59,9 +59,10 @@ class Explainer:
         model_name: str = "RGCN",
         describe: bool = False
     ):
+        self.is_cuda = torch.cuda.is_available()
         self.explainers = explainers
         self.dataset = dataset
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("cuda" if self.is_cuda else "cpu")
         self.model_name = model_name
         self.describe = describe
 
@@ -84,7 +85,6 @@ class Explainer:
         # Desribe graph if requested by user
         if self.describe:
             self.describe_dataset(self.g)
-        
         # Compute and add 'degree' feature for all node types
         for ntype in self.g.ntypes:
             degree_feat = sum(
@@ -156,12 +156,14 @@ class Explainer:
                 num_heads=3,
                 num_hidden_layers=self.hidden_layers,
             ).to(self.device)
-        self.optimizer = th.optim.Adam(
-            self.model.parameters(), lr=self.lr, weight_decay=self.weight_decay
-        )
+        self.optimizer = th.optim.Adam(self.model.parameters(),
+                                       lr=self.lr,
+                                       weight_decay=self.weight_decay)
         self.loss_fn = F.cross_entropy
         self.model.add_module("input_feature", self.input_feature)
-        self.optimizer.add_param_group({"params": self.input_feature.parameters()})
+        self.optimizer.add_param_group({
+            "params": self.input_feature.parameters()
+        })
         self.early_stopping = EarlyStopping(patience=self.patience)
         self.feat = self.model.input_feature()
 
@@ -176,41 +178,38 @@ class Explainer:
 
         # Node degree as sum of incoming edges for each node type
         hetero_feature_base = {
-            ntype: sum(
-            g.in_degrees(etype=canonical_etype).float()
-            for canonical_etype in g.canonical_etypes
-            if canonical_etype[2] == ntype  # Match destination node type
-            )
-            for ntype in g.ntypes
+            ntype: sum(g.in_degrees(etype=canonical_etype).float()
+                       for canonical_etype in g.canonical_etypes
+                       if canonical_etype[2] == ntype) for ntype in g.ntypes
         }
 
         # Normalize node degrees
-        for ntype in hetero_feature_base:
-            hetero_feature_base[ntype] = (hetero_feature_base[ntype] - hetero_feature_base[ntype].min()) / (hetero_feature_base[ntype].max() - hetero_feature_base[ntype].min() + 1e-8)
+        hfb = hetero_feature_base
+        for ntype in hfb:
+            nhn = (hfb[ntype] - hfb[ntype].min())
+            hhd = (hfb[ntype].max() - hfb[ntype].min() + 1e-8)
+            hfb[ntype] = nhn / hhd
 
         # ========= ONE-HOT ENCODING ===========
         node_type_one_hot = {
             ntype: torch.eye(len(g.nodes(ntype)), device=self.device)
             for ntype in g.ntypes
         }
-        for ntype in node_type_one_hot:
-            node_type_one_hot[ntype] = (node_type_one_hot[ntype] - node_type_one_hot[ntype].min()) / (node_type_one_hot[ntype].max() - node_type_one_hot[ntype].min() + 1e-8)
+        oh = node_type_one_hot
+        for ntype in oh:
+            ohfn = (oh[ntype] - oh[ntype].min())
+            ohfd = (oh[ntype].max() - oh[ntype].min() + 1e-8)
+            oh[ntype] = ohfn / ohfd
 
         # ========= CLUSTERING COEFFICIENT ===========
         # Convert to homogeneous grpah to ignore edge types
         homogeneous_graph = dgl.to_homogeneous(g)
-
-        # Convert to NetworkX graph for triangle counting
         nx_graph = homogeneous_graph.to_networkx()
-
-        # remove edge multiplicities
         nx_simple_g = nx.Graph(nx_graph)
-        
         trianggle_dict = nx.triangles(nx_simple_g)
-
         degrees = dict(nx_graph.degree())
-        # Calculate local clustering coefficient for each node
 
+        # Calculate local clustering coefficient for each node
         clustering_coef = {ntype: {} for ntype in g.ntypes}
         for node in nx_graph.nodes():
             k = degrees[node]
@@ -221,11 +220,13 @@ class Explainer:
                 coef = 0.0
 
             # Map the node back to its original type and ID
-            original_ntype, original_id = homogeneous_graph.ndata[dgl.NTYPE][node].item(), homogeneous_graph.ndata[dgl.NID][node].item()
+            original_ntype = homogeneous_graph.ndata[dgl.NTYPE][node].item()
+            original_id = homogeneous_graph.ndata[dgl.NID][node].item()
+
             ntype = self.g.ntypes[original_ntype]
             clustering_coef[ntype][original_id] = coef
 
-        # Combine all heterofeatures 
+        # Combine all heterofeatures
         for ntype in hetero_feature_base:
             combined_features = [
                 hetero_feature_base[ntype].unsqueeze(1),
@@ -233,18 +234,19 @@ class Explainer:
             ]
 
             # Add clustering coefficient if available for the node type
-            clustering_tensor = torch.zeros(len(g.nodes(ntype)), device=self.device)
+            clustering_tensor = torch.zeros(len(g.nodes(ntype)),
+                                            device=self.device)
             for node_id, coef in clustering_coef[ntype].items():
                 clustering_tensor[node_id] = coef
             combined_features.append(clustering_tensor.unsqueeze(1))
 
-            normalized_clustering_tensor = (clustering_tensor - clustering_tensor.min()) / (clustering_tensor.max() - clustering_tensor.min() + 1e-8)
+            ntn = (clustering_tensor - clustering_tensor.min())
+            ntd = (clustering_tensor.max() - clustering_tensor.min() + 1e-8)
+            normalized_clustering_tensor = ntn / ntd
             combined_features.append(normalized_clustering_tensor.unsqueeze(1))
             # Concatenate all features
             hetero_feature_base[ntype] = torch.cat(combined_features, dim=1)
-
         return hetero_feature_base
-
 
     def describe_dataset(self, g):
         etypes = self.g.etypes
@@ -254,12 +256,12 @@ class Explainer:
         print("#Node types:", len(g.ntypes))
         for ntype in g.ntypes:
             print(f"#Count for node type [{ntype}]:", g.num_nodes(ntype))
-        
         print("List of node features:")
         for ntype in g.ntypes:
             i = 0
             if len(g.nodes[ntype].data) > 0:
-                print(f"\tNode type [{ntype}] has features: {list(g.nodes[ntype].data.keys())}")
+                print(f"\tNode type [{ntype}] has features: \
+                      {list(g.nodes[ntype].data.keys())}")
             else:
                 print(f"\tNode type [{ntype}] has no features.")
 
@@ -270,7 +272,9 @@ class Explainer:
             canonical_etype: g.num_edges(canonical_etype)
             for canonical_etype in g.canonical_etypes
         }
-        top_edge_types = sorted(edge_counts.items(), key=lambda x: x[1], reverse=True)[:3]
+        top_edge_types = sorted(edge_counts.items(),
+                                key=lambda x: x[1],
+                                reverse=True)[:3]
         print("Top 3 most used edge types:")
         for canonical_etype, count in top_edge_types:
             print(f"Edge type [{canonical_etype}]: {count} edges")
