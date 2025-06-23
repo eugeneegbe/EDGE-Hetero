@@ -125,7 +125,7 @@ class Explainer:
         self.time_traker = {}
         self.explanations = {}
         self.evaluations = {}
-        self.hetero_features = self.compute_hetero_features(self.g)
+        self.hetero_features = self.compute_hetero_node_features(self.g)
 
         self.input_feature = HeteroFeature(
             {} if self.hetero_features is None else self.hetero_features,
@@ -168,7 +168,7 @@ class Explainer:
         self.train()
         self.run_explainers()
 
-    def compute_hetero_features(self, g):
+    def compute_hetero_node_features(self, g):
         # check if the graph has features if not return None
         if not any(g.nodes[ntype].data for ntype in g.ntypes):
             print("Graph has no features. Returning None.")
@@ -225,21 +225,53 @@ class Explainer:
             ntype = self.g.ntypes[original_ntype]
             clustering_coef[ntype][original_id] = coef
 
+        # ======= PagRank as node feature ======== 
+        # Compute PageRank for each node in the homogeneous graph
+        pagerank_scores = nx.pagerank(nx_graph)
+        # Map PageRank scores back to each node type
+        pagerank_by_type = {ntype: torch.zeros(len(g.nodes(ntype)), device=self.device) for ntype in g.ntypes}
+        for node in nx_graph.nodes():
+            original_ntype_idx = homogeneous_graph.ndata[dgl.NTYPE][node].item()
+            original_nid = homogeneous_graph.ndata[dgl.NID][node].item()
+            ntype = self.g.ntypes[original_ntype_idx]
+            pagerank_by_type[ntype][original_nid] = pagerank_scores[node]
+        # Normalize PageRank for each node type and add as feature
+        for ntype in pagerank_by_type:
+            pr = pagerank_by_type[ntype]
+            normalized_pr = (pr - pr.min()) / (pr.max() - pr.min() + 1e-8)
+            pagerank_by_type[ntype] = normalized_pr.unsqueeze(1)
+
+        # ======= Betweeness Centrality as node feature ======== 
+        betweenness_centrality = nx.betweenness_centrality(nx_graph)
+        betweenness_centrality_type = {ntype: torch.zeros(len(g.nodes(ntype)), device=self.device) for ntype in g.ntypes}
+        for node in nx_graph.nodes():
+            original_ntype_idx = homogeneous_graph.ndata[dgl.NTYPE][node].item()
+            original_nid = homogeneous_graph.ndata[dgl.NID][node].item()
+            ntype = self.g.ntypes[original_ntype_idx]
+            betweenness_centrality_type[ntype][original_nid] = betweenness_centrality[node]
+        # Normalize PageRank for each node type and add as feature
+        for ntype in betweenness_centrality_type:
+            pr = betweenness_centrality_type[ntype]
+            normalized_pr = (pr - pr.min()) / (pr.max() - pr.min() + 1e-8)
+            betweenness_centrality_type[ntype] = normalized_pr.unsqueeze(1)
+
         # Combine all heterofeatures 
         for ntype in hetero_feature_base:
             combined_features = [
-                hetero_feature_base[ntype].unsqueeze(1),
-                node_type_one_hot[ntype],
+                # hetero_feature_base[ntype].unsqueeze(1),
+                # node_type_one_hot[ntype],
+                betweenness_centrality_type[ntype],
+                pagerank_by_type[ntype]
             ]
 
             # Add clustering coefficient if available for the node type
-            clustering_tensor = torch.zeros(len(g.nodes(ntype)), device=self.device)
-            for node_id, coef in clustering_coef[ntype].items():
-                clustering_tensor[node_id] = coef
-            combined_features.append(clustering_tensor.unsqueeze(1))
+            # clustering_tensor = torch.zeros(len(g.nodes(ntype)), device=self.device)
+            # for node_id, coef in clustering_coef[ntype].items():
+            #     clustering_tensor[node_id] = coef
+            # combined_features.append(clustering_tensor.unsqueeze(1))
 
-            normalized_clustering_tensor = (clustering_tensor - clustering_tensor.min()) / (clustering_tensor.max() - clustering_tensor.min() + 1e-8)
-            combined_features.append(normalized_clustering_tensor.unsqueeze(1))
+            # normalized_clustering_tensor = (clustering_tensor - clustering_tensor.min()) / (clustering_tensor.max() - clustering_tensor.min() + 1e-8)
+            # combined_features.append(normalized_clustering_tensor.unsqueeze(1))
             # Concatenate all features
             hetero_feature_base[ntype] = torch.cat(combined_features, dim=1)
 
