@@ -3,7 +3,8 @@ import argparse
 
 # Custom validation function for datasets argument
 def validate_datasets(value):
-    valid_datasets = ["mutag", "aifb", "bgs"] # Add more valid datasets as needed
+    # Add more valid datasets as needed
+    valid_datasets = [ "mutag", "aifb", "bgs" ]
     datasets = value.split()
     for dataset in datasets:
         if dataset not in valid_datasets:
@@ -26,7 +27,8 @@ def validate_model(value):
     valid_models = ["RGCN", "RGAT"]
     if value not in valid_models:
         raise argparse.ArgumentTypeError(
-            f"Invalid model '{value}'. Must be one of: {', '.join(valid_models)}"
+            f"Invalid model ' \
+            {value}'. Must be one of: {', '.join(valid_models)}"
         )
     return value
 
@@ -41,17 +43,19 @@ def validate_explainers(values):
     explainers = values.split()
     for explainer in explainers:
         if explainer not in valid_explainers:
-            raise argparse.ArgumentTypeError(f"Invalid explainer: {explainer}.")
+            raise argparse.ArgumentTypeError(f"Invalid explainer: \
+                                             {explainer}.")
     return explainers[0]
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Framework for training and Evaluation different Explainers on Heterogenous Data."
+        description="Framework for training and Evaluation different \
+            Explainers on Heterogenous Data."
     )
     parser.add_argument(
         "--train",
-        action="store_true",  # Use action='store_false' if you want False as default
+        action="store_true",  # Use action='store_false' for False as default
         help="Specify to print results",
     )
 
@@ -60,7 +64,8 @@ if __name__ == "__main__":
         nargs="+",
         type=validate_datasets,
         default=default_datasets,
-        help=f"Specify the datasets to use, separated by spaces (default: {', '.join(default_datasets)})",
+        help=f"Specify the datasets to use, separated by spaces (default: \
+            {', '.join(default_datasets)})",
     )
 
     # Add argument for explainers
@@ -69,7 +74,8 @@ if __name__ == "__main__":
         nargs="+",
         type=validate_explainers,
         default=default_explainers,
-        help=f"Specify the explainers to use, separated by spaces (default: {', '.join(default_explainers)})",
+        help=f"Specify the explainers to use, separated by spaces (default: \
+            {', '.join(default_explainers)})",
     )
     parser.add_argument(
         "--model",
@@ -87,7 +93,7 @@ if __name__ == "__main__":
     # Add the argument for printing results
     parser.add_argument(
         "--print_results",
-        action="store_true",  # Use action='store_false' if you want False as default
+        action="store_true",  # Use action='store_false' for False as default
         help="Specify to print results",
     )
 
