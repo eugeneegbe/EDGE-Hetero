@@ -1,14 +1,14 @@
 {
   "Run_1": {
     "id1instance": {
-      "best_concept": "OWLObjectAllValuesFrom(property=OWLObjectProperty(IRI('http://swrc.ontoware.org/ontology#','worksAtProject')),filler=OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://swrc.ontoware.org/ontology#','projectInfo')),9,filler=OWLClass(IRI('http://www.w3.org/2002/07/owl#','Thing'))))",
+      "best_concept": "OWLObjectAllValuesFrom(property=OWLObjectProperty(IRI('http://swrc.ontoware.org/ontology#','worksAtProject')),filler=OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://swrc.ontoware.org/ontology#','isAbout')),7,filler=OWLClass(IRI('http://swrc.ontoware.org/ontology#','Topic'))))",
       "concept_length": 6
     }
   },
   "Run_2": {
     "id1instance": {
-      "best_concept": "OWLObjectAllValuesFrom(property=OWLObjectProperty(IRI('http://swrc.ontoware.org/ontology#','worksAtProject')),filler=OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://swrc.ontoware.org/ontology#','projectInfo')),9,filler=OWLClass(IRI('http://www.w3.org/2002/07/owl#','Thing'))))",
-      "concept_length": 6
+      "best_concept": "OWLObjectAllValuesFrom(property=OWLObjectProperty(IRI('http://swrc.ontoware.org/ontology#','worksAtProject')),filler=OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://swrc.ontoware.org/ontology#','member')),4,filler=OWLObjectAllValuesFrom(property=OWLObjectProperty(IRI('http://swrc.ontoware.org/ontology#','head')),filler=OWLClass(IRI('http://swrc.ontoware.org/ontology#','Meeting')))))",
+      "concept_length": 8
     }
   },
   "Run_3": {
@@ -19,13 +19,13 @@
   },
   "Run_4": {
     "id1instance": {
-      "best_concept": "OWLObjectAllValuesFrom(property=OWLObjectProperty(IRI('http://swrc.ontoware.org/ontology#','worksAtProject')),filler=OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://swrc.ontoware.org/ontology#','projectInfo')),9,filler=OWLClass(IRI('http://swrc.ontoware.org/ontology#','Publication'))))",
+      "best_concept": "OWLObjectAllValuesFrom(property=OWLObjectProperty(IRI('http://swrc.ontoware.org/ontology#','worksAtProject')),filler=OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://swrc.ontoware.org/ontology#','isAbout')),7,filler=OWLClass(IRI('http://www.w3.org/2002/07/owl#','Thing'))))",
       "concept_length": 6
     }
   },
   "Run_5": {
     "id1instance": {
-      "best_concept": "OWLObjectAllValuesFrom(property=OWLObjectProperty(IRI('http://swrc.ontoware.org/ontology#','worksAtProject')),filler=OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://swrc.ontoware.org/ontology#','isAbout')),7,filler=OWLClass(IRI('http://swrc.ontoware.org/ontology#','ResearchTopic'))))",
+      "best_concept": "OWLObjectAllValuesFrom(property=OWLObjectProperty(IRI('http://swrc.ontoware.org/ontology#','worksAtProject')),filler=OWLObjectMaxCardinality(property=OWLObjectProperty(IRI('http://swrc.ontoware.org/ontology#','projectInfo')),9,filler=OWLClass(IRI('http://www.w3.org/2002/07/owl#','Thing'))))",
       "concept_length": 6
     }
   }
