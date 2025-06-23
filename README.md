@@ -6,7 +6,7 @@ The **[EDGE](https://github.com/ds-jrg/EDGE)** framework is a novel framework fo
 
 
 
-## Logical Approaches
+## Logical Approaches Used
 1. **EvoLearner:** [EvoLearner: Learning Description Logics with Evolutionary Algorithms](https://arxiv.org/abs/2111.04879)
 2. **CELOE:**  [Class Expression Learning for Ontology Engineering](https://www.sciencedirect.com/science/article/pii/S1570826811000023)
 
