@@ -2,7 +2,9 @@
 
 The **[EDGE](https://github.com/ds-jrg/EDGE)** framework is a novel framework for evaluating explanations from various node classifiers on knowledge graphs, utilizing advanced Graph Neural Networks and a range of evaluation metrics. It automates the evaluation process, aiming to quantitatively assess explainers and streamline evaluations with real-world datasets. This however does not cover heterogenous features of the graphs which are provided as input to these classifiers.
 
-**EDGE-Hetero** justs simply seeks to add more flavor to the features used by the EDGE and report the findings of the behavior of the models and explainers with the added features.
+**EDGE-Hetero** justs simply seeks to add more flavor to the features used by the EDGE and report the findings of the behavior of the models and explainers with the added features. We explore the effects of both global and local features. The main branch covers just local node features. To use global features, switch to the `test-global-features` branch.
+
+
 
 ## Logical Approaches
 1. **EvoLearner:** [EvoLearner: Learning Description Logics with Evolutionary Algorithms](https://arxiv.org/abs/2111.04879)
