@@ -1,14 +1,11 @@
 import json
+from owlapy import owl_expression_to_dl
 
-prefix = 'http://swrc.ontoware.org/ontology#'
-# Load the JSON file
 json_file_path = "/home/eugene/paderborn/xai/mini-project/EDGE-Hetero/results/predictions/RGAT/EvoLearner/aifb.json"
 with open(json_file_path, "r") as file:
     data = json.load(file)
 
-# Improved renderer for OWL expressions without IRIs
 def render_owl_expression(expression):
-    # Replace OWL-specific syntax with a more human-readable format
     replacements = {
         "OWLObjectAllValuesFrom": "∀",
         "OWLObjectMaxCardinality": "≤",
@@ -19,21 +16,26 @@ def render_owl_expression(expression):
         "OWLObjectProperty": "",
         "OWLClass": "",
         "IRI": "",
+        "property=": "",
+        "filler=": "",
     }
     for key, value in replacements.items():
         expression = expression.replace(key, value)
-    # Remove the prefix
-    expression = expression.replace(prefix, "").replace("=", " ")
-    # Remove unwanted characters
-    return expression.translate(str.maketrans("", "", "()',"))
+    # Remove extra characters for readability
+    for ch in ["(", ")", "'", ","]:
+        expression = expression.replace(ch, " ")
+    # Collapse multiple spaces
+    expression = " ".join(expression.split())
+    return expression.strip()
 
-# Iterate through the JSON structure and render expressions
+# Usage
 for run, instances in data.items():
     for instance_id, details in instances.items():
         best_concept = details.get("best_concept")
         if best_concept:
-            # Render the class expression manually
             readable_expression = render_owl_expression(best_concept)
             print(f"Run: {run}, Instance: {instance_id}")
-            print(f"Human-readable class expression: {readable_expression}")
+            print(
+                f"DL class expression: {readable_expression.replace('http://swrc.ontoware.org/ontology#', '').replace('http://www.w3.org/2002/07/owl#', '')}"
+            )
             print("-" * 80)

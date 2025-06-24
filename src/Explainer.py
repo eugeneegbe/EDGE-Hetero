@@ -236,10 +236,6 @@ class Explainer:
             # Add clustering coefficient if available for the node type
             clustering_tensor = torch.zeros(len(g.nodes(ntype)),
                                             device=self.device)
-            for node_id, coef in clustering_coef[ntype].items():
-                clustering_tensor[node_id] = coef
-            combined_features.append(clustering_tensor.unsqueeze(1))
-
             ntn = (clustering_tensor - clustering_tensor.min())
             ntd = (clustering_tensor.max() - clustering_tensor.min() + 1e-8)
             normalized_clustering_tensor = ntn / ntd
