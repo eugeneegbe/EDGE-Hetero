@@ -120,3 +120,9 @@ If you just want to observe the results we had, <details><summary> Click me! </s
 |    CELOE    |   aifb  |     0.722     |     0.647      |    0.733    |     0.688     |    0.756     |     0.718     |   0.751    |    0.733     |
 |  EvoLearner |   aifb  |     0.672     |     0.567      |    0.947    |     0.707     |    0.706     |     0.614     |    0.950   |    0.743     |
 </details>
+
+To see the learnt clas expressionsuse the following commands
+```shell
+python src/render_leant_exp.py 
+```
+
