@@ -125,4 +125,11 @@ To see the learnt clas expressionsuse the following commands
 ```shell
 python src/render_leant_exp.py 
 ```
+## Visualize Explanations
+To be able to generate new visualization images of the expressions run the following from the root directory:
+* Install the graphviz package on linux/ubuntu
+```shell
+sudo apt install graphviz
+python src/render_leant_exp.py 
+```
 
