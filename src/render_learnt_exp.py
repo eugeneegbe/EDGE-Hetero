@@ -44,6 +44,29 @@ def split_args(s):
 
 
 def parse_owl_expression(expr: str):
+    """
+    Parses a string representation of an OWL (Web Ontology Language)
+    expression and returns the corresponding OWL object.
+
+    The function supports parsing the following OWL constructs:
+        - OWLObjectAllValuesFrom
+        - OWLObjectMaxCardinality
+        - OWLObjectSomeValuesFrom
+        - OWLObjectProperty
+        - OWLClass
+        - IRI
+
+    Args:
+        expr (str):
+        The string representation of the OWL expression to parse.
+
+    Returns:
+        An OWL object corresponding to the parsed expression.
+        The specific type depends on the input expression.
+
+    Raises:
+        ValueError: cannot parse OWL construct.
+    """
     expr = expr.strip()
     # OWLObjectAllValuesFrom
     if expr.startswith("OWLObjectAllValuesFrom"):
@@ -132,9 +155,29 @@ print(f'reasonser found {len(instances_exp1)} for  Expression: {exp_1}')
 # 2. Visualize the leant expressions
 def visualize_class_expression(expr, run_name="expr_graph"):
     """
-    Visualizes an OWL class expression as a graph using Graphviz.
-    The visualization is a best-effort and may not capture all logical
-    structure.
+    Visualizes an OWL class expression as a directed graph using Graphviz.
+
+    This function takes an OWL class expression and generates a graphical
+    representation of its structure, attempting to capture the logical
+    relationships between its components. The resulting graph is saved as a PNG
+    file with a name based on the provided `run_name`.
+
+    Args:
+        expr: The OWL class expression to visualize. This should be an instance
+            of OWLClass, OWLObjectSomeValuesFrom, OWLObjectAllValuesFrom,
+            OWLObjectMaxCardinality, or similar.
+        run_name (str, optional): The base name for the output file. The graph
+            will be saved as '{run_name}_expr_graph.png'.
+            Defaults to "expr_graph".
+
+    Notes:
+        - The visualization is a best-effort attempt and may not capture all
+          logical nuances of complex OWL expressions.
+        - Requires Graphviz and the `graphviz` Python package to be installed.
+
+    Side Effects:
+        - Generates and saves a PNG image file of the class expression.
+        - Prints the filename of the generated image.
     """
 
     dot = Digraph(comment=f'Class Expression: {run_name}')
