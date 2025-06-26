@@ -50,7 +50,7 @@ conda create --name edge-hetero python=3.10 && conda activate edge-hetero
 
 ### Step 5: Install Dependencies
 
-Navigate inside the EDGE-Hetero directory using ( `cd EDGE-Hetero ` ). Ensure you have a `requirements.txt` file in your project directory. To install the required dependencies, run:
+Navigate inside the EDGE-Hetero directory using (`cd EDGE-Hetero `). Ensure you have a `requirements.txt` file in your project directory. To install the required dependencies, run:
 
 ```shell
 pip install -r requirements.txt
