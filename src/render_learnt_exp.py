@@ -114,6 +114,7 @@ def parse_owl_expression(expr: str):
 parser = DLSyntaxParser(namespace=swrc_ns)
 learnt_expressions = []
 
+print('\n ============= LEARNT CLASS EXPRESSIONS =============\n')
 for run, instances in data.items():
     for instance_id, details in instances.items():
         best_concept = details.get("best_concept")
@@ -122,7 +123,6 @@ for run, instances in data.items():
 
         if best_concept:
             readable_expression = owl_expression_to_dl(exp)
-            print(f"Run: {run}, Instance: {instance_id}")
             print(
                 f"DL class expression: {readable_expression}"
             )
@@ -140,16 +140,9 @@ structural_reasoner = StructuralReasoner(onto, property_cache=True,
                                          sub_properties=False)
 
 # 1. Find all individuals that are instances of the expression
-instances_exp1 = structural_reasoner.instances(exp_1)
-instances_exp3 = structural_reasoner.instances(exp_3)
-
-print(f'reasonser found {len(instances_exp1)} for  Expression: {exp_1}')
-print(f'reasonser found {len(instances_exp1)} for  Expression: {exp_1}')
-
-# super_classes = list(structural_reasoner.super_classes(exp_1, direct=False))
-# equiv_classes = list(structural_reasoner.equivalent_classes(exp_1))
-# sub_classes = list(structural_reasoner.sub_classes(exp_1))
-# instances = list(structural_reasoner.instances(exp_1))
+for exp in learnt_expressions:
+    indv = structural_reasoner.instances(exp)
+    print(f'reasonser found {len(list(indv))} Individuals for  Expression: {owl_expression_to_dl(exp)} \n')
 
 
 # 2. Visualize the leant expressions
@@ -213,15 +206,17 @@ def visualize_class_expression(expr, run_name="expr_graph"):
         else:
             label = str(expr)
             dot.node(node_id, label)
-        return node_id
+      worksAtProject.(∀ projectInfo.(≤ 3 isAbout.(≤ 6 dealtWithIn.⊤))) 
+   return node_id
 
     root_id = add_expr(expr)
     dot.node("ROOT", "Expression")
     dot.edge("ROOT", root_id)
 
     dot.render(f'{run_name}_expr_graph', format='png', cleanup=True)
-    print(f"Generated {run_name}_expr_graph.png")
+    print(f"Check Visual generation in {run_name}_expr_graph.png" + \
+          f"for Expression: {owl_expression_to_dl(expr)}")
 
-
-visualize_class_expression(exp_1, "Run_1")
-visualize_class_expression(exp_3, "Run_3")
+print('\n ============= VISUALISATIONS =============\n')
+visualize_class_expression(learnt_expressions[0], "Run_1")
+visualize_class_expression(learnt_expressions[3], "Run_3\n")
