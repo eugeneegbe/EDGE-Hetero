@@ -127,7 +127,7 @@ python src/render_leant_exp.py
 ```
 ## Visualize Explanations
 To be able to generate new visualization images of the expressions run the following from the root directory:
-* Install the graphviz package on linux/ubuntu
+* Install the graphviz package on linux/ubuntu and then run the renderer
 ```shell
 sudo apt install graphviz
 python src/render_leant_exp.py 
