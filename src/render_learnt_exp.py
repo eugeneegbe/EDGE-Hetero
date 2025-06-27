@@ -3,7 +3,8 @@ import os
 import re
 from owlapy.class_expression import (OWLClass, OWLObjectAllValuesFrom,
                                      OWLObjectMaxCardinality,
-                                     OWLObjectSomeValuesFrom)
+                                     OWLObjectSomeValuesFrom,
+                                     OWLThing)
 from owlapy.owl_property import OWLObjectProperty
 from owlapy.owl_reasoner import StructuralReasoner
 from graphviz import Digraph
@@ -111,7 +112,7 @@ def parse_owl_expression(expr: str):
     raise ValueError(f"Cannot parse: {expr}")
 
 
-parser = DLSyntaxParser(namespace=swrc_ns)
+parser = DLSyntaxParser(namespace=swrc_ns,)
 learnt_expressions = []
 
 print('\n ============= LEARNT CLASS EXPRESSIONS =============\n')
@@ -206,8 +207,7 @@ def visualize_class_expression(expr, run_name="expr_graph"):
         else:
             label = str(expr)
             dot.node(node_id, label)
-      worksAtProject.(∀ projectInfo.(≤ 3 isAbout.(≤ 6 dealtWithIn.⊤))) 
-   return node_id
+        return node_id
 
     root_id = add_expr(expr)
     dot.node("ROOT", "Expression")
@@ -215,8 +215,22 @@ def visualize_class_expression(expr, run_name="expr_graph"):
 
     dot.render(f'{run_name}_expr_graph', format='png', cleanup=True)
     print(f"Check Visual generation in {run_name}_expr_graph.png" + \
-          f"for Expression: {owl_expression_to_dl(expr)}")
+          f"for Expression:{owl_expression_to_dl(expr)}")
 
 print('\n ============= VISUALISATIONS =============\n')
 visualize_class_expression(learnt_expressions[0], "Run_1")
-visualize_class_expression(learnt_expressions[3], "Run_3\n")
+visualize_class_expression(learnt_expressions[3], "Run_3")
+
+
+exp_ind_1 = indv = list(structural_reasoner.instances(learnt_expressions[3]))[0]
+
+axiom_triples = []
+object_properties = structural_reasoner.ind_object_properties(exp_ind_1)
+for op in object_properties:
+    object_properties_values = structural_reasoner.object_property_values(exp_ind_1, op)
+    for obj in object_properties_values:
+        s = exp_ind_1
+        p = op
+        o = obj
+        axiom_triples.append((s, p, o))
+        print(f"Subject: {s}, Predicate: {p}, Object: {o}")
